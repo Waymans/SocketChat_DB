@@ -1,0 +1,43 @@
+include head.pug
+if user
+  #contain
+    #myModal.modal
+      .modal-content
+        p Send a private message to
+          |
+          |
+          span#name
+          | !
+        form#privateMsg(action='')
+          input#pm(type='text', autocomplete='off', max='100')
+          button Send
+        #result
+    #displayTop
+      span#num
+      |
+      | users online.
+      strong.nav &equiv;
+    #displayOnline
+      | Users:
+      |
+      span#users
+    #messages
+      #below
+    form#input(action='')
+      input#m(type='text', autocomplete='off', max='100')
+      button Send
+      a(href="/logout") Logout
+    #displayBottom
+      #displayUserBottom.float-right
+else
+  .container
+    .svg-contain.md
+      a(href='/login/github')
+        svg(height='62', width='320')
+          rect.shape(y='1', height='60', width='320')
+          .text GitHub Login
+    .svg-contain.svg-contain1.sm
+      a(href='/login/github')
+        svg(height='47', width='240')
+          rect.shape.shape1(y='1', height='45', width='240')
+          .text.text1 GitHub Login
