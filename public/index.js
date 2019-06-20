@@ -7,6 +7,7 @@ things to change/update:
 $(function () {
   var socket = io();
   var agent = navigator.userAgent.match(/Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile|WPDesktop/i);
+  var myName, myColor, myPhoto;
   
   agent ? $('#input').css('padding', 2): null;
   
@@ -19,7 +20,7 @@ $(function () {
     if (msg === '') {return false;};
     socket.emit('chat message', msg);
     $('#m').val('');
-    maker('red','underline','YOU',new Date(),msg,false);
+    maker(myColor,true,myName,new Date(),msg,false,myPhoto);
     scroll(false);
     return false;
   });
@@ -32,7 +33,9 @@ $(function () {
     $('#result').text('Message Sent').fadeIn(500).delay(2000).fadeOut(500);
     return false;
   });
-  
+  socket.on('myInfo', function(data){
+    myName = data.name, myColor = data.color, myPhoto = data.photo;
+  });
   socket.on('new user', function(data){
     var res = '<span><strong style="color: '+data.color+'">'+data.name+'</strong> joined.</span>';
     $('#displayUserBottom').html(res);
@@ -61,12 +64,12 @@ $(function () {
   });    
      
   socket.on('chat message', function(data){
-    maker(data.color,'none',data.name,new Date(),data.msg,false);
+    maker(data.color,false,data.name,new Date(),data.msg,false,data.photo);
     scroll(false);
   });
   
   socket.on('private message', function(data){
-    maker(data.color,'none',data.name,new Date(),data.msg,true);
+    maker(data.color,false,data.name,new Date(),data.msg,true,data.photo);
     scroll(false);
   });
       
@@ -104,26 +107,24 @@ $(function () {
       timeout = setTimeout(timeoutFunction, 2000);
     };
   };
-  function maker(color,line,name,date,message,pm) {
-    var cont = $('<div>'),
-        row1 = $('<div>').attr('class','row1'),
-        col1 = $('<div>').attr('class','column1 name').css({'color': color,'text-decoration-line': line}).text(name),
-        col2 = $('<div>').attr('class','column1 date').text(time(date)),
-        col3 = $('<div>').attr('class','column1 blank1'),
-        col4 = $('<div>').attr('class','column1 other'),
-        span = $('<span>').attr('class','myBtn').html('&middot; &middot; &middot;').click(profile),
-        row2 = $('<div>').attr('class','row2'),
-        col5 = $('<div>').attr('class','column2 blank2'),
-        col6 = $('<div>').attr('class','column3').text(message);
-    if (pm) {
-      var span2 = $('<span>').text(' - PM').css('color','#333');
-      col6.css('background','lightsteelblue');
-      col1.append(span2);
-    }
-    col4.append(span);
-    row1.append(col1).append(col2).append(col3).append(col4);
-    row2.append(col5).append(col6);
-    cont.append(row1).append(row2)
+  function maker(color,line,name,date,message,pm,photo) {
+    var cont = $('<div>').attr('class','message'),
+        row = $('<div>').attr('class','row'),
+        col1 = $('<div>').attr('class','col1'),
+        col2 = $('<div>').attr('class','col2'),
+        img = $('<img>').attr('class','img').attr('src',photo),
+        out = $('<span>').click(privateM),
+        strn = $('<strong>').css('color', color).text(name),
+        span = $('<span>').attr('class','date').text(` - ${time(date)}`),
+        btn = $('<button>').attr('class','float-right').html('&#8942;').click(profile),
+        para = $('<p>').text(message);
+    if (pm) { cont.addClass('pm'); }
+    if (self) { cont.addClass('self'); }
+    col1.append(img);
+    out.append(strn);
+    col2.append(out).append(span).append(btn).append(para);
+    row.append(col1).append(col2);
+    cont.append(row);
     $('#messages').append(cont);
     height();
   };
@@ -171,7 +172,7 @@ $(function () {
     var top = $('#displayTop').outerHeight() + $('#displayOnline').outerHeight();
     var bot = $('#input').outerHeight();
     var total = doc - (top + bot) - 25;
-    $(document).width() < 400 ? border ? total = doc - (top + bot) - 5: total = doc - (top + bot) - 25: null;
+    $(document).width() < 400 ? border ? total = doc - (top + bot) - 4: total = doc - (top + bot) - 24: null;
     $('#messages').css({'min-height': total, 'max-height': total, 'overflow-y': 'scroll', 'border-bottom': '2px solid black'});
   };
   
@@ -186,7 +187,7 @@ $(function () {
       $('#below').fadeOut(500);
     } else {
       var locat = mess.scrollTop();
-      hidden - locat > 77 ? messageBelow(): mess.animate({ scrollTop: hidden }, 500);
+      hidden - locat > 200 ? messageBelow(): mess.animate({ scrollTop: hidden }, 500);
     };
   };
   
@@ -197,7 +198,7 @@ $(function () {
       $(this).prop('scrollHeight') - $(this).height() - $(this).scrollTop() < 77 ? $('#below').fadeOut(500): null;
     });
   };
-	
+  
   function detectMobile() {
     if (agent) { return '100%' } 
     else { return 'calc(100% - 17px)' }

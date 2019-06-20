@@ -45,24 +45,3 @@ module.exports = function (app, db) {
     }
   ));
 }
-
-/*
-
-db.collection('users').findAndModify({id: profile.id},{},
-        {$setOnInsert:{
-          id: profile.id,
-          username: profile.username,
-          color: colors[rand],
-          name: profile.displayName || 'Anonymous',
-          photo: profile.photos[0].value || '',
-          email: profile.emails[0].value || 'No public email',
-          created_on: new Date(),
-          friends: [],
-          messages: [],
-          socket_id: '',
-          chat_messages: 0
-        },$set:{ last_login: new Date() },$inc:{ login_count: 1 }},{upsert: true, new: true}, (err, doc) => {
-          return cb(null, doc.value);
-      });
-
-*/
