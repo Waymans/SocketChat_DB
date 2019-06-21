@@ -54,6 +54,7 @@ io.on('connection', function(socket){
   var user = socket.request.user;
   var userName = user.username;
   var userColor = user.color;
+  var userPhoto = user.photo;
   var userId; // for disconnect
   var colorU; // for disconnect
   var nameU; // for disconnect
@@ -63,29 +64,30 @@ io.on('connection', function(socket){
     if (err) throw err;
     userId = res.value.socket_id;
     colorU = res.value.color;
+    nameU = res.value.username;
     currentList.push(res.value);
     ++currentUsers; // dont need
     io.emit('new user', { name: userName, color: userColor }); // could combine these
     io.emit('count', { count: currentUsers });
     io.emit('users', { users: currentList });
+    socket.emit('myInfo', { name: userName, color: userColor, photo: userPhoto });
   }); 
   
-  
-  socket.on('chat message', function(msg, color){
-    socket.broadcast.emit('chat message', { msg: msg, name: userName, color: color});
+  socket.on('chat message', function(msg){
+    socket.broadcast.emit('chat message', { msg: msg, name: userName, color: userColor, photo: userPhoto});
   });  
   
-  socket.on('typing', function(color){
-	  socket.broadcast.emit('typing', { name: userName, color: color });
+  socket.on('typing', function(){
+	  socket.broadcast.emit('typing', { name: userName, color: userColor });
   });
   
-  socket.on('not typing', function(data){
+  socket.on('not typing', function(){
 	  socket.broadcast.emit('not typing');
   });
   
   socket.on('private message', function(msg, name){ 
     var id = currentList[currentList.findIndex(i => i.username === name)].socket_id;
-    io.to(id).emit('private message', { name: userName, color: userColor, msg: msg });
+    io.to(id).emit('private message', { name: userName, color: userColor, msg: msg, photo: userPhoto });
   });
 
   socket.on('disconnect', function(socket){
