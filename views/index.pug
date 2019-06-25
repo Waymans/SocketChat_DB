@@ -9,7 +9,7 @@ if user
           span#name
           | !
         form#privateMsg(action='')
-          input#pm(type='text', autocomplete='off', max='100')
+          input#pm(type='text', autocomplete='off', maxlength='300')
           button Send
         #result
     #displayTop
@@ -24,7 +24,7 @@ if user
     #messages
       #below
     form#input(action='')
-      input#m(type='text', autocomplete='off', max='100')
+      input#m(type='text', autocomplete='off', maxlength='300')
       button Send
       a(href="/logout") Logout
     #displayBottom
