@@ -26,11 +26,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://glitch.me/#!/project/glaze-kitchen"
+    "url": "https://glitch.me/#!/glaze-kitchen"
   },
   "keywords": [
     "node",
-    "hyperdev",
     "express"
   ],
   "license": "MIT"
